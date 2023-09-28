@@ -7,10 +7,11 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 
-class DrawingView(context: Context, attrs: AttributeSet): View(context, attrs) {
+class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) {
     private lateinit var drawPath: FingerPath
     private lateinit var canvasPaint: Paint
     private lateinit var drawPaint: Paint
@@ -36,6 +37,7 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context, attrs) {
 
         when (event?.action) {
             MotionEvent.ACTION_DOWN -> {
+                drawPath = FingerPath(color, brushSize)
                 drawPath.color = color
                 drawPath.brushThickness = brushSize.toFloat()
 
@@ -48,7 +50,6 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context, attrs) {
             }
 
             MotionEvent.ACTION_UP -> {
-                drawPath = FingerPath(color, brushSize)
                 paths.add(drawPath)
             }
 
@@ -88,5 +89,14 @@ class DrawingView(context: Context, attrs: AttributeSet): View(context, attrs) {
         brushSize = 20.toFloat()
     }
 
-    internal inner class FingerPath(var color: Int, var brushThickness: Float): Path()
+    fun changeBrushSize(newSize: Float) {
+        brushSize = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            newSize,
+            resources.displayMetrics
+        )
+        drawPaint.strokeWidth = brushSize
+    }
+
+    internal inner class FingerPath(var color: Int, var brushThickness: Float) : Path()
 }
