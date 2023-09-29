@@ -1,3 +1,13 @@
 <resources>
     <string name="app_name">Drawing App</string>
+    <string name="brush_button_description">A brush</string>
+    <string name="purple_button_description">A purple</string>
+    <string name="green_button_description">A green</string>
+    <string name="blue_button_description">A blue</string>
+    <string name="orange_button_description">A orange</string>
+    <string name="red_button_description">A red</string>
+    <string name="save_button_description">Save on gallery</string>
+    <string name="gallery_button_description">Get image from gallery</string>
+    <string name="undo_button_description">Undo action</string>
+    <string name="color_picker_button_description">Choose a color</string>
 </resources>
