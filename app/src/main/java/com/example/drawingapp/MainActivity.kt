@@ -1,6 +1,7 @@
 package com.example.drawingapp
 
 import android.app.Dialog
+import android.content.pm.PackageManager
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -8,6 +9,12 @@ import android.view.View
 import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContract
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
 import yuku.ambilwarna.AmbilWarnaDialog
 import yuku.ambilwarna.AmbilWarnaDialog.OnAmbilWarnaListener
 
@@ -21,6 +28,23 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var greenButton: ImageButton
     private lateinit var undoButton: ImageButton
     private lateinit var colorPickerButton: ImageButton
+    private lateinit var galleryButton: ImageButton
+
+    private val requestPermissions: ActivityResultLauncher<Array<String>> =
+        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+            permissions.entries.forEach {
+                val permissionName = it.key
+                val isGranted = it.value
+
+                if (isGranted && permissionName == android.Manifest.permission.READ_EXTERNAL_STORAGE) {
+                    Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show()
+                } else {
+                    if (permissionName == android.Manifest.permission.READ_EXTERNAL_STORAGE) {
+                        Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,6 +59,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         greenButton = findViewById(R.id.green_button)
         undoButton = findViewById(R.id.undo_button)
         colorPickerButton = findViewById(R.id.color_picker_button)
+        galleryButton = findViewById(R.id.gallery_button)
 
         drawingView.changeBrushSize(23.toFloat())
         brushButton.setOnClickListener {
@@ -48,6 +73,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         greenButton.setOnClickListener(this)
         undoButton.setOnClickListener(this)
         colorPickerButton.setOnClickListener(this)
+        galleryButton.setOnClickListener(this)
     }
 
     private fun showBrushChooseDialog() {
@@ -99,6 +125,18 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             R.id.color_picker_button -> {
                 showColorPickerDialog()
             }
+
+            R.id.gallery_button -> {
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        android.Manifest.permission.READ_EXTERNAL_STORAGE
+                    ) != PackageManager.PERMISSION_GRANTED
+                ) {
+                    requestStoragePermission()
+                } else {
+                    // Get the image
+                }
+            }
         }
     }
 
@@ -112,5 +150,29 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         })
 
         dialog.show()
+    }
+
+    private fun requestStoragePermission() {
+        if (ActivityCompat.shouldShowRequestPermissionRationale(
+                this,
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            )
+        ) {
+            showRationaleDialog()
+        } else {
+            requestPermissions.launch(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE))
+        }
+    }
+
+    private fun showRationaleDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Storage permission")
+            .setMessage("We need this permission in order to access the internal storage")
+            .setPositiveButton(R.string.dialog_yes) { dialog, _ ->
+                requestPermissions.launch(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE))
+                dialog.dismiss()
+            }
+
+        builder.create().show()
     }
 }
