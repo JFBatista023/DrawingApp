@@ -1,12 +1,15 @@
 package com.example.drawingapp
 
 import android.app.Dialog
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
 import android.widget.SeekBar
 import android.widget.TextView
+import yuku.ambilwarna.AmbilWarnaDialog
+import yuku.ambilwarna.AmbilWarnaDialog.OnAmbilWarnaListener
 
 class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var drawingView: DrawingView
@@ -17,6 +20,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var blueButton: ImageButton
     private lateinit var greenButton: ImageButton
     private lateinit var undoButton: ImageButton
+    private lateinit var colorPickerButton: ImageButton
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +34,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         redButton = findViewById(R.id.red_button)
         greenButton = findViewById(R.id.green_button)
         undoButton = findViewById(R.id.undo_button)
+        colorPickerButton = findViewById(R.id.color_picker_button)
 
         drawingView.changeBrushSize(23.toFloat())
         brushButton.setOnClickListener {
@@ -41,8 +46,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         orangeButton.setOnClickListener(this)
         redButton.setOnClickListener(this)
         greenButton.setOnClickListener(this)
-
         undoButton.setOnClickListener(this)
+        colorPickerButton.setOnClickListener(this)
     }
 
     private fun showBrushChooseDialog() {
@@ -90,6 +95,22 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             R.id.undo_button -> {
                 drawingView.undoPath()
             }
+
+            R.id.color_picker_button -> {
+                showColorPickerDialog()
+            }
         }
+    }
+
+    private fun showColorPickerDialog() {
+        val dialog = AmbilWarnaDialog(this, Color.GREEN, object : OnAmbilWarnaListener {
+            override fun onCancel(dialog: AmbilWarnaDialog?) {}
+
+            override fun onOk(dialog: AmbilWarnaDialog?, color: Int) {
+                drawingView.setColor(color)
+            }
+        })
+
+        dialog.show()
     }
 }
