@@ -103,5 +103,12 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         drawPaint.color = color
     }
 
+    fun undoPath() {
+        if (paths.size > 0) {
+            paths.removeAt(paths.size - 1)
+            invalidate()
+        }
+    }
+
     internal inner class FingerPath(var color: Int, var brushThickness: Float) : Path()
 }
