@@ -11,4 +11,5 @@
     <string name="undo_button_description">Undo action</string>
     <string name="color_picker_button_description">Choose a color</string>
     <string name="dialog_yes">Yes</string>
+    <string name="image_view_description">A image from gallery</string>
 </resources>

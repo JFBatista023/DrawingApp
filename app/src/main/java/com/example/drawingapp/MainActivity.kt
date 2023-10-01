@@ -1,19 +1,17 @@
 package com.example.drawingapp
 
 import android.app.Dialog
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
-import android.widget.ImageButton
-import android.widget.SeekBar
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContract
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import yuku.ambilwarna.AmbilWarnaDialog
 import yuku.ambilwarna.AmbilWarnaDialog.OnAmbilWarnaListener
@@ -30,6 +28,11 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var colorPickerButton: ImageButton
     private lateinit var galleryButton: ImageButton
 
+    private val openGalleryLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            findViewById<ImageView>(R.id.gallery_image).setImageURI(result.data?.data)
+        }
+
     private val requestPermissions: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
             permissions.entries.forEach {
@@ -38,6 +41,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
                 if (isGranted && permissionName == android.Manifest.permission.READ_EXTERNAL_STORAGE) {
                     Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show()
+                    val pickIntent =
+                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    openGalleryLauncher.launch(pickIntent)
                 } else {
                     if (permissionName == android.Manifest.permission.READ_EXTERNAL_STORAGE) {
                         Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
@@ -134,7 +140,9 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                 ) {
                     requestStoragePermission()
                 } else {
-                    // Get the image
+                    val pickIntent =
+                        Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                    openGalleryLauncher.launch(pickIntent)
                 }
             }
         }
